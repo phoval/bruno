@@ -1,0 +1,27 @@
+name: win package
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  win:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: npm i
+      - name: Build
+        run: |
+          npm run build --workspace=packages/bruno-query
+          npm run build --workspace=packages/bruno-graphql-docs
+          npm run build --workspace=packages/bruno-app
+          bash ./scripts/build-electron.sh win
+      - name: Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: win
+          path: packages/bruno-electron/out/bruno_*_x64_win.zip
